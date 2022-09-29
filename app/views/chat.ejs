@@ -26,9 +26,9 @@
                 style="height: 20rem; position: relative;">
                 <h5>Persons Online</h5>
                 <div class="col">
-                    <h6 class="m-0">
+                    <p class="m-0">
                         <%= dados.username %>
-                    </h6>
+                    </p>
                 </div>
             </div>
 
@@ -39,11 +39,10 @@
                 <!-- FORM ENVIO DE MSG  -->
                 <div class="rounded d-flex justify-content-center my-2 bg-success">
                     <div class="col-11 p-1">
-                        <input id="username" hidden value='<%= dados.username %>' type="text" />
-                        <input id="mensagem" class="form-control m-1"
-                            placeholder="Escreva a sua mensagem"></input>
+                        <input id="username" hidden value="<%= dados.username %>" type="text" />
+                        <input id="mensagem" class="form-control m-1" placeholder="Escreva a sua mensagem"></input>
                     </div>
-                    <button onclick="enviarMensagem()" class="btn text-white m-1" type="button" id="btnEnviar">
+                    <button id="btnEnviar" onclick="enviar()" class="btn text-white m-1" type="button">
                         <i class="bi bi-send-fill"></i>
                     </button>
                 </div>
@@ -61,35 +60,34 @@
     <script>
         const SERVER_URL = "http://localhost:5000";
         const socket = io(SERVER_URL);
-        let enviar_mensagem = document.getElementById('enviar_mensagem')
-        let userField = document.getElementById("username");
-        let messageField = document.getElementById("mensagem");
 
-        function enviarMensagem() {
-            socket.emit("msgParaServidor", {
-                username: userField.value,
-                message: messageField.value,    
-            });
+        function enviar() {
+            const userField = document.getElementById("username");
+            const messageField = document.getElementById("mensagem");
+
+            const usuario = userField.value;
+            const message = messageField.value;
+            const time = new Date().toLocaleTimeString().slice(0, 5);
+
+            console.log(usuario, mensagem);
+
+            socket.emit('iniciaChat', { usuario, message, time });
+
         }
-        socket.on("msgParaCliente", (data) => {
-            let div = document.createElement("div");
-            div.classList.add(
+
+        socket.on("showMessage", (data) => {
+            const chatScreen = document.getElementById("chat");
+            const col = document.createElement("div");
+            col.classList.add(
                 "col",
+                "bg-mensagem",
                 "rounded",
                 "p-1",
                 "m-2"
             );
-            let col = document.createElement("div");
-            let h4 = document.createElement("h4");
-            h4.innerText = `<%= dados.username %>`;
-            let p = document.createElement("p");
-            p.classList.add("m-0");
-            p.innerText = data.message;
-            let chatScreen = document.getElementById("chat");
-            chatScreen.appendChild(div);
-            div.appendChild(col);
-            col.appendChild(h4);
-            col.appendChild(p);
+            col.innerHTML = `<div class="m-0 p-0"><h6 class="text-dark m-0 p-0 ">${data.usuario}</h6> <p class="text-muted p-0 m-0">${data.time}</p>
+            ${data.message}</div>`;
+            chatScreen.append(col);
         });
     </script>
 </body>

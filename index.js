@@ -19,17 +19,17 @@ const DB = {
     users: [
         {
             id: 1,
-            username: 'jose',
+            username: 'José',
             password: '2002',
         },
         {
             id: 2,
-            username: 'bianca',
+            username: 'Bianca',
             password: '1234',
         },
         {
             id: 3,
-            username: 'cris',
+            username: 'Cris',
             password: '54321',
         },
     ]
@@ -143,16 +143,10 @@ io.on("connection", (socket) => {
       console.log("Saiu da sala.");
     });
   
-    socket.on("msgParaServidor", (data) => {
-      socket.emit("msgParaCliente", {
-        username: data.username,
-        mensagem: data.mensagem,
-      });
-  
-      socket.broadcast.emit("msgParaCliente", {
-        username: data.username,
-        mensagem: data.mensagem,
-      });
+    socket.on('iniciaChat', (data) => {
+      console.log('SERVER', data);
+      socket.emit('showMessage', data);
+      socket.broadcast.emit('showMessage', data);
     });
   });
 
