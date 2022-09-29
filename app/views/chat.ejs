@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PoliceChat</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" />
+    <link rel="icon" type="image" href="../images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-dark">
+    <div class="container p-0">
+        <div class="row my-4">
+            <h2 class="text-light text-right">PoliceChat</h2>
+
+            <!-- USUARIOS ONLINE -->
+            <div class="col-2 py-3 rounded overflow-auto bg-light border border-success"
+                style="height: 20rem; position: relative;">
+                <h5>Persons Online</h5>
+                <div class="col">
+                    <h6 class="m-0">
+                        <%= dados.username %>
+                    </h6>
+                </div>
+            </div>
+
+            <!-- CAIXA DE MSG -->
+            <div class="col-9 ">
+                <div id="chat" class="rounded overflow-auto bg-light border border-success" style="height: 30rem;">
+                </div>
+                <!-- FORM ENVIO DE MSG  -->
+                <div class="rounded d-flex justify-content-center my-2 bg-success">
+                    <div class="col-11 p-1">
+                        <input id="username" hidden value='<%= dados.username %>' type="text" />
+                        <input id="mensagem" class="form-control m-1"
+                            placeholder="Escreva a sua mensagem"></input>
+                    </div>
+                    <button onclick="enviarMensagem()" class="btn text-white m-1" type="button" id="btnEnviar">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+        crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/1240f22ab7.js" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const SERVER_URL = "http://localhost:5000";
+        const socket = io(SERVER_URL);
+        let enviar_mensagem = document.getElementById('enviar_mensagem')
+        let userField = document.getElementById("username");
+        let messageField = document.getElementById("mensagem");
+
+        function enviarMensagem() {
+            socket.emit("msgParaServidor", {
+                username: userField.value,
+                message: messageField.value,    
+            });
+        }
+        socket.on("msgParaCliente", (data) => {
+            let div = document.createElement("div");
+            div.classList.add(
+                "col",
+                "rounded",
+                "p-1",
+                "m-2"
+            );
+            let col = document.createElement("div");
+            let h4 = document.createElement("h4");
+            h4.innerText = `<%= dados.username %>`;
+            let p = document.createElement("p");
+            p.classList.add("m-0");
+            p.innerText = data.message;
+            let chatScreen = document.getElementById("chat");
+            chatScreen.appendChild(div);
+            div.appendChild(col);
+            col.appendChild(h4);
+            col.appendChild(p);
+        });
+    </script>
+</body>
+
+</html>
